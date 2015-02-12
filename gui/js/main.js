@@ -16,7 +16,6 @@ var step_duration = 0.1;
 var old_data;
 
 function init(){	
-	grab_colours();
     canvas = document.getElementById("canvas");
 	context = canvas.getContext('2d');
 	update_data();
@@ -26,6 +25,7 @@ function init(){
 }
 
 function update_data(){
+	grab_colours();
 	context.clearRect(0, 0, grid_size, grid_size);
 	draw_square(0, 0, grid_size, colours['background']);
 	draw_data(gen_data());
