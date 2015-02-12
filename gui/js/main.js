@@ -9,26 +9,37 @@ Array.prototype.clone = function() {
 var self = this;
 var canvas, context;
 var grid_size = 800;
-var block_size = 10;
+var block_size = 8;
 var block_count = grid_size / block_size;
 var colours = {}
 var step_duration = 0.1;
 var old_data;
 
-function init(){	
+function init(){
+	grab_colours();
+    var client = new Faye.Client('http://172.30.152.64:8080/faye');
+
     canvas = document.getElementById("canvas");
 	context = canvas.getContext('2d');
-	update_data();
+    
+    var subscription = client.subscribe('/foo', function(data){
+    	console.log("got");
+        update_data(data);
+    });
+    var publication = client.publish('/yo', {text: 'Hello, this is Matt'});
+	// update_data(gen_data());
+
 	setInterval(function(){
-		update_data();
-	}, step_duration * 1000);
+		update_data(gen_data());
+    	client.publish('/yo', {text: 'Hello, this is Matt'});
+	}, 50)
 }
 
-function update_data(){
-	grab_colours();
+function update_data(data){
+	colours['block'] = tinycolor(colours['block']).spin(1);
 	context.clearRect(0, 0, grid_size, grid_size);
 	draw_square(0, 0, grid_size, colours['background']);
-	draw_data(gen_data());
+	draw_data(data);
 }
 
 function draw_data(data){
@@ -62,7 +73,7 @@ function true_or_false(){
 function grab_colours(){
 	$(".colour").each(function(x, i){
 		var dom = $(i);
-		colours[dom.data('tag')] = dom.css("background-color");
+		colours[dom.data('tag')] = tinycolor(dom.css("background-color"));
 	});
 }
 

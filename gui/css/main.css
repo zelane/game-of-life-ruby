@@ -51,22 +51,48 @@ textarea {
     padding: 0.2em 0;
 }
 
+body{
+    overflow: hidden;
+    padding: 0px;
+    margin: 0px;
+}
 
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
-
+#wrapper{
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    background: #333;
+/*     background: url("https://newevolutiondesigns.com/images/freebies/retro-wallpaper-35.jpg"); */
+}
+#canvas{
+    height: 100%;
+    width: 100%;
+    border: 5px solid rgba(0,0,0,0.2);
+/*     mix-blend-mode: multiply; */
+}
 #colours{
     visibility: hidden;
 }
 .colour[data-tag="background"]{
-    background-color: #5EFFD4;
+    background-color: #555;
+}
+.colour[data-tag="background"]{
+    background-color: transparent;
 }
 .colour[data-tag="grid"]{
     background-color: rgba(0,0,0,0.1);
 }
 .colour[data-tag="block"]{
-    background-color: rgba(0,0,0,0.3);
+    background-color: hsl(0, 70%, 70%);
 }
 
 /* ==========================================================================
