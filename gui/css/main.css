@@ -56,19 +56,18 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+#colours{
+    visibility: hidden;
+}
+.colour[data-tag="background"]{
+    background-color: #5EFFD4;
+}
+.colour[data-tag="grid"]{
+    background-color: rgba(0,0,0,0.1);
+}
+.colour[data-tag="block"]{
+    background-color: rgba(0,0,0,0.3);
+}
 
 /* ==========================================================================
    Media Queries
