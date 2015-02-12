@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>GAME OF LIFE</title>
+    <script type="text/javascript"
+            src="faye-browser.js">
+    </script>
+</head>
+<body>
+<script type="text/javascript">
+    var client = new Faye.Client('http://172.30.152.64:8080/faye');
+    var subscription = client.subscribe('/foo', function(message) {
+        console.log(message)
+    });
+</script>
+
+</body>
+</html>
