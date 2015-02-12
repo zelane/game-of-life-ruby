@@ -12,8 +12,6 @@ var grid_size = 800;
 var block_size = 8;
 var block_count = grid_size / block_size;
 var colours = {}
-var step_duration = 0.1;
-var old_data;
 
 function init(){
 	grab_colours();
@@ -23,20 +21,19 @@ function init(){
 	context = canvas.getContext('2d');
     
     var subscription = client.subscribe('/foo', function(data){
-    	console.log("got");
+    	// console.log("got", data[0]);
         update_data(data);
     });
     var publication = client.publish('/yo', {text: 'Hello, this is Matt'});
 	// update_data(gen_data());
 
 	setInterval(function(){
-		update_data(gen_data());
+		// update_data(gen_data());
     	client.publish('/yo', {text: 'Hello, this is Matt'});
-	}, 50)
+	}, 100)
 }
 
 function update_data(data){
-	colours['block'] = tinycolor(colours['block']).spin(1);
 	context.clearRect(0, 0, grid_size, grid_size);
 	draw_square(0, 0, grid_size, colours['background']);
 	draw_data(data);
@@ -51,6 +48,7 @@ function draw_data(data){
 				draw_block(c, r);
 			}
 		}
+		colours['block'] = tinycolor(colours['block']).spin(10);
 	}
 }
 
@@ -75,10 +73,6 @@ function grab_colours(){
 		var dom = $(i);
 		colours[dom.data('tag')] = tinycolor(dom.css("background-color"));
 	});
-}
-
-function rgba(r, g, b, a){
-	return "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
 }
 
 function draw_grid(){
