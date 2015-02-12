@@ -13,6 +13,15 @@
     var subscription = client.subscribe('/foo', function(message) {
         console.log(message)
     });
+
+    var publication = client.publish('/yo', 'ME BEN');
+
+    publication.then(function() {
+        console.log('Message received by server!');
+    }, function(error) {
+        console.log('There was a problem: ' + error.message);
+    });
+
 </script>
 
 </body>
