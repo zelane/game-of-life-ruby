@@ -52,12 +52,17 @@ class GameOfLife
         end
       end
     end
-    @count += 1
-    # if @count % 100 == 0
-    #     @grid = init_grid(NIL)
-    # end
+    if @count % 50 == 0
+        init_shape(random_shapes(1)[0], new_grid)
+    end
     @grid = new_grid
     return @grid
+  end
+
+  def init_shape(shape, grid)
+    for coords in shape
+      grid[coords[0]][coords[1]] = true
+    end
   end
 
   def init_grid(shapes)
@@ -69,9 +74,7 @@ class GameOfLife
       end
     end
     for shape in shapes
-      for coords in shape
-        grid[coords[0]][coords[1]] = true
-      end
+      init_shape(shape, grid)
     end
     return grid
   end
@@ -136,6 +139,18 @@ class ShapeMaker
   end
 end
 
+def random_shapes(num)
+  r = Random.new
+  safe = 4
+  options = ['toad', 'beacon', 'lightweight_spaceship', 'blinker', 'glider']
+  shapes = []
+  for n in 1..num
+    obj = options[r.rand(options.length)]
+    shapes << ShapeMaker.send(obj, r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe))
+  end
+  return shapes
+end
+
 def run_it(client)
   while true
     client.publish('/yo', 'SERVER');
@@ -145,26 +160,9 @@ end
 
 EventMachine.run {
   client = Faye::Client.new('http://172.30.152.64:8080/faye')
-  r = Random.new
-  safe = 4
-  gol = GameOfLife.new(shapes=[
-     ShapeMaker.glider(0, 0),
-     ShapeMaker.glider(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.glider(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.glider(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.blinker(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.blinker(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.blinker(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.beacon(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.beacon(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.beacon(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.lightweight_spaceship(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.lightweight_spaceship(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.lightweight_spaceship(r.rand(GRID_SIZE-safe),r.rand(GRID_SIZE-safe)),
-     ShapeMaker.toad(r.rand(GRID_SIZE-safe), r.rand(GRID_SIZE-safe)),
-     ShapeMaker.toad(r.rand(GRID_SIZE-safe), r.rand(GRID_SIZE-safe)),
-     ShapeMaker.toad(r.rand(GRID_SIZE-safe), r.rand(GRID_SIZE-safe)),
-   ])
+  # init_shapes = [ShapeMaker.glider(0, 0), ShapeMaker.send('toad', 50, 50)]
+  init_shapes =
+  gol = GameOfLife.new(shapes=random_shapes(8))
   client.subscribe('/yo') do |message|
     client.publish('/foo', gol.get_grid())
   end
