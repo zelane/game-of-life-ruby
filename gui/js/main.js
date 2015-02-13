@@ -8,48 +8,112 @@ Array.prototype.clone = function() {
 
 var self = this;
 var canvas, context;
-var grid_size = 800;
 var block_size = 8;
-var block_count = grid_size / block_size;
-var colours = {}
+var block_count = 1;
+var colours = {};
+var t = 300;
+var render_int;
+var client;
 
 function init(){
 	grab_colours();
-    var client = new Faye.Client('http://172.30.152.64:8080/faye');
-
-    canvas = document.getElementById("canvas");
-	context = canvas.getContext('2d');
-    
-    var subscription = client.subscribe('/foo', function(data){
-    	// console.log("got", data[0]);
-        update_data(data);
+	client = new Faye.Client('http://172.30.152.64:8080/faye');
+    canvas = new fabric.Canvas('canvas', {
+    	renderOnAddRemove: false,
+    	stateful: false
     });
-    var publication = client.publish('/yo', {text: 'Hello, this is Matt'});
-	// update_data(gen_data());
-
-	setInterval(function(){
-		// update_data(gen_data());
-    	client.publish('/yo', {text: 'Hello, this is Matt'});
-	}, 100)
+	context = canvas.getContext('2d');
+    client.subscribe('/config', function(data){
+    	console.log(data);
+    	block_count = data['grid_size'];
+    	t = data['interval'] * 1000;
+    	init_rects();
+	    client.subscribe('/grid', function(data){
+			draw_data(data);
+	    });
+    });
 }
 
-function update_data(data){
-	context.clearRect(0, 0, grid_size, grid_size);
-	draw_square(0, 0, grid_size, colours['background']);
-	draw_data(data);
+function three(){
+	var scene = new THREE.Scene();
+	var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+	var renderer = new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+	var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+	
+	var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+	var cube = new THREE.Mesh( geometry, material );
+	scene.add( cube );
+
+	var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+	var cube = new THREE.Mesh( geometry, material );
+	scene.add( cube );
+
+	camera.position.z = 5;
+	function render() {
+		requestAnimationFrame( render );
+		renderer.render( scene, camera );
+	}
+	render();
+}
+
+function init_rects(){
+	canvas.clear();
+	var c = block_count - 1;
+	for(c; c != 0; c--){
+		var r = block_count - 1;
+		for(r; r != 0; r--){
+			var rect = new fabric.Rect({
+				left: c * block_size,
+				top: r * block_size,
+				fill: 'red',
+				width: block_size,
+				height: block_size,
+				selectable: false,
+				opacity: 0
+			})
+			canvas.add(rect);
+		}
+	}
+	canvas.renderAll();
 }
 
 function draw_data(data){
-	for(var c = 0; c < data.length; c += 1){
-		var column = data[c];
-		for(var r = 0; r < column.length; r += 1){
-			var cell = column[r];
-			if(cell){
-				draw_block(c, r);
+	var i = 0;
+	var c = block_count - 1;
+	for(c; c != 0; c--){
+		var r = block_count - 1;		
+		for(r; r != 0; r--){
+			var state = data[c][r];
+			var rect = canvas.item(i);
+			if(state){
+				rect.set({
+					fill: colours['block'].toHexString(),
+					opacity: 1
+				})
+				// rect.animate('opacity', 1, {
+				// 	duration: t / 5,
+			 //  		// easing: fabric.util.ease.easeInCubic
+				// }); 
 			}
+			else{
+				rect.set({
+					opacity: 0
+				})
+				// rect.animate('opacity', 0, {
+				// 	duration: t * 0.8
+				// }); 
+			}
+			i++;
 		}
 		colours['block'] = tinycolor(colours['block']).spin(10);
 	}
+	// clearInterval(render_int);
+	// render_int = setInterval(function(){
+	// 	canvas.renderAll()
+	// }, t / 10);
+	canvas.renderAll();
 }
 
 function gen_data(){
@@ -73,33 +137,4 @@ function grab_colours(){
 		var dom = $(i);
 		colours[dom.data('tag')] = tinycolor(dom.css("background-color"));
 	});
-}
-
-function draw_grid(){
-	for (var x = 0.5; x <= grid_size; x += block_size) {
-		context.moveTo(x, 0);
-		context.lineTo(x, grid_size);
-	}
-	for (var y = 0.5; y <= grid_size; y += block_size) {
-		context.moveTo(0, y);
-		context.lineTo(grid_size, y);
-	}	
-	context.strokeStyle = colours['grid'];
-	context.stroke();
-}
-
-function draw_block(col, row){
-	var x = col * block_size;
-	var y = row * block_size;
-	draw_square(x, y, block_size, colours['block']);
-}
-
-function clear_block(x, y){
-	context.clearRect(x, y, block_size, block_size);
-	draw_square(x, y, block_size, colours['background']);
-}
-
-function draw_square(x, y, size, colour){
-    context.fillStyle = colour;
-	context.fillRect(x, y, size, size);	
 }
