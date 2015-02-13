@@ -47,7 +47,7 @@ function three(){
 
 function draw_block(x, y, color){
 	graphics.beginFill(color, 1);
-	// graphics.lineStyle(5, 0xFF0000);
+	graphics.lineStyle(2, 0x111111);
 	graphics.drawRect(x, y, 8, 8);
 }
 
@@ -55,13 +55,17 @@ function draw_data(data){
 	graphics.clear();
 	var c = block_count - 1;
 	var colour = colours['block'];
+	var i = 0;
 	for(c; c != 0; c--){
 		var r = block_count - 1;		
 		for(r; r != 0; r--){
 			if(data[c][r]){
 				draw_block(c*8, r*8, "0x" + colour.toHex());
-				colour = tinycolor(colour).spin(1);
 			}
+			i++;
+		}
+		if(i % 20){
+			colour = tinycolor(colour).spin(23);	
 		}
 	}
 }
