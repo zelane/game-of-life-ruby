@@ -38,6 +38,7 @@ function three(){
 	requestAnimFrame(animate);
 	graphics = new PIXI.Graphics();
 	stage.addChild(graphics);
+	stage.addChild(graphics);
 
 	function animate(){
 	    requestAnimFrame(animate);
@@ -47,8 +48,8 @@ function three(){
 
 function draw_block(x, y, color){
 	graphics.beginFill(color, 1);
-	graphics.lineStyle(2, 0x111111);
-	graphics.drawRect(x, y, 8, 8);
+	graphics.lineStyle(1, 0x111111, 1);
+	graphics.drawRect(x, y, block_size, block_size);
 }
 
 function draw_data(data){
@@ -60,7 +61,7 @@ function draw_data(data){
 		var r = block_count - 1;		
 		for(r; r != 0; r--){
 			if(data[c][r]){
-				draw_block(c*8, r*8, "0x" + colour.toHex());
+				draw_block(c*block_size, r*block_size, "0x" + colour.toHex());
 			}
 			i++;
 		}
