@@ -73,12 +73,6 @@ body{
     background: #333;
 /*     background: url("https://newevolutiondesigns.com/images/freebies/retro-wallpaper-35.jpg"); */
 }
-#canvas{
-    height: 100%;
-    width: 100%;
-    /* border: 5px solid rgba(0,0,0,0.2); */
-/*     mix-blend-mode: multiply; */
-}
 #colours{
     visibility: hidden;
 }
